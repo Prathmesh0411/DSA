@@ -1,295 +1,110 @@
+/*Read the marks obtained by students of second year in an online examination
+of particular subject. Find out maximum and minimum marks obtained in that
+subject. Use heap data structure. Analyze the algorithm*/
 #include<iostream>
+#include<cmath>
 using namespace std;
-
-class node
+# define max1 20
+class stud
 {
-public:
-	string key;
-	string meaning;
-	node *left;
-	node *right;
-};
-
-class AVL
-{
-	node *root;
 	public:
-		AVL()
-		{
-			root=NULL;
-		}
-
-	void create();
-	node* insert(node *cur,node *temp);
-	node* balance(node *temp);
-	int dif(node *temp);
-	int height(node *temp);
-	int maximum(int a,int b);
-
-	node* LL(node *par);
-	node* RR(node *par);
-	node* LR(node *par);
-	node* RL(node *par);
-
-	void ascending(node *temp);
-	node* delete_n(node *root,string key1);
-	void deleten();
-
-	node* extractmin(node *t);
-	void descending(node *temp);
-	void display();
-	bool search(node *cur,string key1);
-	void search_value();
-};
-
-void AVL::create()
-{
-char answer;
-node *temp;
-	do
-	{
-		temp=new node();
-		cout<<endl<<"Enter keyword:\t";
-		cin>>temp->key;
-		cout<<"Enter meaning:\t";
-		cin>>temp->meaning;
-		temp->left=temp->right=NULL;
-
-		root=insert(root,temp);
-
-		cout<<endl<<"Add another word? (y/n):\t";
-		cin>>answer;
-	}
-while(answer=='y'||answer=='Y');
-}
-
-
-node* AVL::insert(node *cur,node *temp)
-{
-	if(cur==NULL)
-	{
-		return temp;
-	}
-	if(temp->key<cur->key)
-	{
-		cur->left=insert(cur->left,temp);
-		cur=balance(cur);
-	}
-	else if(temp->key>cur->key)
-	{
-		cur->right=insert(cur->right,temp);
-		cur=balance(cur);
-	}
-	return cur;
-}
-
-node* AVL::balance(node *temp)
-{
-	int bal;
-	bal=dif(temp);
-
-	if(bal>=2)
-	{
-		if(dif(temp->left)<0)
-			temp=LR(temp);
-		else
-			temp=LL(temp);
-	}
-	else if(bal<=-2)
-	{
-		if(dif(temp->right)<0)
-			temp=RR(temp);
-		else
-			temp=RL(temp);
-	}
-	return temp;
-}
-
-int AVL::dif(node *temp)
-{
-	int l,r;
-	l=height(temp->left);
-	r=height(temp->right);
-	return(l-r);
-}
-
-int AVL::height(node *temp)
-{
-	if(temp==NULL)
-		return(-1);
-	else
-		return(max(height(temp->left),height(temp->right))+1);
-}
-
-int AVL::maximum(int a,int b)
-{
-	if(a>b)
-		return a;
-	else
-		return b;
-}
-
-node* AVL::LL(node *par)
-{
-	node *temp,*temp1;
-	temp=par->left;
-	temp1=temp->right;
-	temp->right=par;
-	par->left=temp1;
-	return temp;
-}
-
-node* AVL::RR(node *par)
-{
-	node *temp,*temp1;
-	temp=par->right;
-	temp1=temp->left;
-	temp->left=par;
-	par->right=temp1;
-	return temp;
-}
-
-node* AVL::LR(node *par)
-{
-	par->left=RR(par->left);
-	return(LL(par));
-}
-
-node* AVL::RL(node *par)
-{
-	par->right=LL(par->right);
-	return(RR(par));
-}
-
-void AVL::ascending(node *temp)
-{
-	if(temp!=NULL)
-	{
-		ascending(temp->left);
-		cout<<"\n\t"<<temp->key<<" : "<<temp->meaning;
-		ascending(temp->right);
-	}
-}
-
-void AVL::descending(node *temp)
-{
-if(temp!=NULL)
-	{
-		descending(temp->right);
-		cout<<"\n\t"<<temp->key<<" : "<<temp->meaning;
-		descending(temp->left);
-	}
-}
-
-
-void AVL::display()
-{
-	cout<<endl<<"Keywords in ascending order:\t";
-	ascending(root);
-	cout<<endl<<"Keywords in descending order:\t";
-	descending(root);
-}
-
-bool AVL::search(node *cur,string key1)
-{
-    if(cur)
+	int marks[max1], total;
+	 stud()
     {
-        if(cur->key==key1)
-            return true;
-        if(cur->key>key1)
-            return search(cur->left,key1);
-        else
-            return search(cur->right,key1);
+    for(int i=0;i<max1;i++)
+      marks[i]=0;
     }
-    return false;
-}
-
-void AVL::search_value()
+	void createHeap();
+	void displayHeap();
+	void showmax();
+	void showmin();
+};
+void stud::createHeap()
 {
-	string key2;
-	cout<<endl<<"Keyword to search:\t";
-	cin>>key2;
-	if(search(root,key2))
-		cout<<endl<<"Keyword exists in AVL tree.";
-	else
-		cout<<endl<<"Keyword does not exist in AVL tree.";
+	int i,j,par,temp,M;
+	cout<<"\n Enter How many Stu : ";
+	cin>>total; //5
+	for(i=0;i<total;i++)  //0-4=5 times
+	{
+		cout<<"\n Enter Marks :  ";
+		cin>>marks[i];
+		M=marks[i];
+		j=i;//j is child
+		par=floor((j-1)/2);
+		    while(marks[j] < marks[par] && j!=0)
+		   {
+		   	 temp=marks[j];
+		   	 marks[j]=marks[par];
+		   	 marks[par]=temp;
+		   	 j=par;
+		   	 par=floor((j-1)/2);
+		   	}
+	cout<<"\n \n Current Heap : After Inserting : "	<<M<<" is : \n ";
+	displayHeap();
+	}
 }
-
-
-node* AVL::delete_n(node* cur,string key1)
+void stud::displayHeap()
 {
-	if ( !cur)
-		return cur;
-	if ( key1 < cur->key )
-		cur->left = delete_n(cur->left, key1);
-
-	else if( key1 > cur->key )
-		cur->right = delete_n(cur->right, key1);
-
-	else
-		{
-		node *l = cur->left;
-		node *r = cur->right;
-		delete cur;
-		if ( !r )
-			return l;
-		node *m=r;
-
-		while(m->left)
-			m=m->left;
-		m->right = extractmin(r);
-		m->left = l;
-		return balance(m);
-		}
-	return balance(cur);
-}
-
-node* AVL::extractmin(node *t)
+	int i=0,space=6;
+cout<<endl;
+while(i<total)
 {
-if ( !t->left )
-	return t->right;
-t->left = extractmin(t->left);
-return balance(t);
+    if(i==0 || i==1 || i==3 || i==7 || i==15)
+    {
+    cout<<endl<<endl;
+    for(int j=0;j<space;j++)
+         cout<<" ";
+    space-=2;   
+    }
+   cout<<" "<<marks[i];i++;
+         }
 }
-
-void AVL::deleten()
+void stud::showmin()
 {
-string key;
-cout<<endl<<"Keyword to delete:\t";
-cin>>key;
-root=delete_n(root,key);
-}
+	cout<<marks[0];
+	}
+
+void stud::showmax()
+{
+	int max,i;
+	max=marks[0];
+	for(i=1;i<total;i++)
+	{
+		if(max < marks[i])
+			max=marks[i];
+	}
+		cout<<max;
+	}
 
 int main()
 {
-char c;
-int ch;
-AVL a;
-do
-{
-cout<<endl<<"--- MAIN MENU ---";
-cout<<endl<<"1 -> Insert keyword";cout<<endl<<"2 -> Display AVL tree";
-cout<<endl<<"3 -> Search a keyword";
-cout<<endl<<"4 -> Delete a keyword";
+	stud s1;
+	int ch, ans;
+	do
+	{
+	cout<<"\n 1. Insert Marks ";
+	cout<<"\n 2. Display Marks ";
+	cout<<"\n 3. Show Max Marks ";
+	cout<<"\n 4. Show Min Marks ";
+	cout<<"\n\n Enter Your Choice : ";
+	cin>>ch;
+	switch(ch)
+	{
+		case 1: 
+			s1.createHeap();
+			break;
+		case 2:
+				s1.displayHeap();
+				break;
+			case 3: s1.showmax();
+			break;
+			case 4: s1.showmin();
+			break;	
+			}
+	cout<<" \n Do u want to continue : (1 for continue )";
+	cin>>ans;
+}while(ans==1);
+	
+	return 0;
+}
 
-cout<<endl<<"Choose an option (1-4):\t";
-cin>>ch;
-switch(ch)
-{
-	case 1 : a.create();
-		break;
-	case 2 : a.display();
-		break;
-	case 3 : a.search_value();
-		break;
-	case 4 : a.deleten();
-		break;
-	default : cout<<endl<<"Please choose a valid option (1-4).";
-}
-	cout<<endl<<"Would you like to continue? (y/n):\t";
-	cin>>c;
-}
-	while(c=='y'||c=='Y');
-		cout<<"\n\n// END OF CODE\n\n";
-return 0;
-}
