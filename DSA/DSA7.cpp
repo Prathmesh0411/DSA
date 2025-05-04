@@ -1,3 +1,9 @@
+/*You have a business with several offices; you want to lease phone lines to
+connect them up with each other; and the phone company charges different
+amounts of money to connect different pairs of cities. You want a set of lines
+that connects all your offices with a minimum total cost. Solve the problem by
+suggesting appropriate data structures.*/
+
 #include<iostream>
 using namespace std;
 class Office
@@ -43,8 +49,10 @@ void Office::display()
         }
    }
 }
+
 void Office::Prims()
 {
+    n=10;
   int visit[n], minCost=0, count=1, minIndex, cost=0;
     for(int i=0 ; i<n ; i++)
         visit[i] = 0;
