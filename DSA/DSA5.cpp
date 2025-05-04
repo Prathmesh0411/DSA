@@ -1,134 +1,138 @@
 #include <iostream>
-#include<string.h>
+#include <cstring>
+#include <cctype>
 using namespace std;
-struct node
-	{
-	char data;
-	node *left;
-	 node *right;
-	 };
-class tree
-{	char prefix[20];
-	public: node *top;
-		void expression(char []);
-		void display(node *);
-		 void non_rec_postorder(node *);
-		 void del(node *);
-		
+
+struct node {
+    char data;
+    node *left;
+    node *right;
 };
-class stack1
-    {
-        node *data[30];
-	int top;
-	public:
-	stack1()
-	{
-		top=-1;
-	}
-		int empty()
-		   {
-			if(top==-1)
-				return 1;
-			return 0;
-		   }
-	       void push(node *p)
-		   {
-			data[++top]=p;
-		   }
-	       node *pop()
-	           {
-		   return(data[top--]);
-	           }
-         };
 
-void tree::expression(char prefix[])
- {
- char c;
- stack1 s;
- node *t1,*t2;
- int len,i;
- len=strlen(prefix);
- for(i=len-1;i>=0;i--)
- 	{
-         top=new node;
-         top->left=NULL;
-	 top->right=NULL;
- 	if(isalpha(prefix[i]))
- 	     {
- 	 	top->data=prefix[i];
- 		s.push(top);
-             }
-	else if(prefix[i]=='+'||prefix[i]=='*'||prefix[i]=='-'||prefix[i]=='/')
-             {
-		 t2=s.pop();
-                 t1=s.pop();
-		 top->data=prefix[i];
-		 top->left=t2;
-		 top->right=t1;
-		 s.push(top); 	
-             }
-	 }
-   top=s.pop();
- }
+class stack1 {
+    node *data[30];
+    int top;
+public:
+    stack1() {
+        top = -1;
+    }
 
-void tree::display(node * root)
- { 	
- 	if(root!=NULL)
- 	{ 	cout<<root->data<<"\n";
- 		display(root->left);
- 		display(root->right);
-	 }
+    bool empty() {
+        return top == -1;
+    }
+
+    void push(node *p) {
+        if (top < 29) {
+            data[++top] = p;
+        } else {
+            cout << "Stack overflow!\n";
+        }
+    }
+
+    node* pop() {
+        if (!empty()) {
+            return data[top--];
+        } else {
+            cout << "Stack underflow!\n";
+            return nullptr;
+        }
+    }
+
+    node* peek() {
+        if (!empty()) {
+            return data[top];
+        }
+        return nullptr;
+    }
+};
+
+class tree {
+public:
+    node *top;
+
+    tree() {
+        top = nullptr;
+    }
+
+    void expression(const char expr[]) {
+        stack1 s;
+        int len = strlen(expr);
+
+        for (int i = len - 1; i >= 0; i--) {
+            if (isalpha(expr[i])) {
+                node *newNode = new node{expr[i], nullptr, nullptr};
+                s.push(newNode);
+            } else if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/') {
+                node *t1 = s.pop();
+                node *t2 = s.pop();
+                node *newNode = new node{expr[i], t1, t2};
+                s.push(newNode);
+            }
+        }
+
+        top = s.pop();
+    }
+
+    void display(node *root) {
+        if (root != nullptr) {
+            cout << root->data << " ";
+            display(root->left);
+            display(root->right);
+        }
+    }
+
+    void non_rec_postorder(node *top) {
+        if (top == nullptr) return;
+
+        stack1 s1, s2;
+        s1.push(top);
+
+        while (!s1.empty()) {
+            node *curr = s1.pop();
+            s2.push(curr);
+
+            if (curr->left) s1.push(curr->left);
+            if (curr->right) s1.push(curr->right);
+        }
+
+        while (!s2.empty()) {
+            node *n = s2.pop();
+            cout << n->data << " ";
+        }
+        cout << "\n";
+    }
+
+    void del(node *n) {
+        if (n == nullptr) return;
+
+        del(n->left);
+        del(n->right);
+
+        delete n;
+    }
+};
+
+int main() {
+    char expr[30];
+    tree t;
+
+    cout << "Enter prefix expression: ";
+    cin >> expr;
+
+    t.expression(expr);
+
+    cout << "\nPrefix expression (Preorder Traversal): ";
+    t.display(t.top);
+    cout << "\n";
+
+    cout << "Non-Recursive Postorder Traversal: ";
+    t.non_rec_postorder(t.top);
+
+    cout << "Deleting tree...\n";
+    t.del(t.top);
+    t.top = nullptr;
+
+    cout << "Tree deleted successfully.\n";
+
+    return 0;
 }
-
-void tree::non_rec_postorder(node *top)
-   {	stack1 s1,s2;     /*stack s1 is being used for flag . A NULL data
-			implies that the right subtree has not been visited */
-	node *T=top;
-	cout<<"\n";
-	s1.push(T);
-       while(!s1.empty())
-        {
-         T=s1.pop();
-          s2.push(T);
-         if(T->left!=NULL)
-           s1.push(T->left);
-          if(T->right!=NULL)
-          s1.push(T->right);
-     }
-while(!s2.empty())
-{
-top=s2.pop();
-cout<<top->data<<"\n";
-}}
-  
-void tree::del(node* node)  
-{
-    if (node == NULL) return;
-      /* first delete both subtrees */
-    del(node->left);
-    del(node->right);
-        /* then delete the node */
-    cout<<" Deleting node:"<<node->data<<"\n";
-    delete (node);
-}  
- 
-int main()
- {
- 	char expr[20];
- 	tree t;
-        cout<<"Enter prefix  Expression: "<<"\n";
- 	cin>>expr;
-	cout<<"\nOperation is performed on: ";
- 	cout<<expr<<"\n";
-	cout<<"\nElements of expession:\n";
-        t.expression(expr);
-	cout<<"\nPrefix expession:\n";
-	t.display(t.top);
-	cout<<endl;
-	t.non_rec_postorder(t.top);
-	cout<<"\nDeletion of elements:\n";
-	t.del(t.top);
-	cout<<"\nElements after deletion:\n";
-	t.display(t.top);
- 
- }
